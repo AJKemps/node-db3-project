@@ -7,6 +7,7 @@ module.exports = {
   add,
   update,
   remove,
+  addStep,
 };
 
 function find() {
@@ -32,9 +33,29 @@ function add(scheme) {
     });
 }
 
-function update() {
-  return; //
+function update(changes, id) {
+  return db("schemes")
+    .where({ id })
+    .update(changes)
+    .then(() => {
+      return findById(id);
+    });
 }
-function remove() {
-  return; //
+function remove(id) {
+  return db("schemes").where({ id }).del();
+}
+
+function addStep(stepData, scheme_id) {
+  return db("steps")
+    .insert({
+      step_number: stepData.step_number,
+      instructions: stepData.instructions,
+      scheme_id: scheme_id,
+    })
+    .returning(scheme_id)
+    .then((response) => {
+      let id = response[0];
+
+      return db("steps").where({ id });
+    });
 }
